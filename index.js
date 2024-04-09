@@ -11,19 +11,22 @@ context.fillStyle = '#3f50a6'
 context.fillRect(0, 0, width, height)
 
 // Data for items (sauce, dough, oil)
+const json = JSON.parse(fs.readFileSync('./stock-results.json'))
+
 const items = [
-	{name: 'Sauce', prices: [20, 22, 19, 21, 20, 23, 25, 20, 22, 19, 21, 20, 23, 25], color: 'red'},
-	{name: 'Dough', prices: [40, 42, 45, 40, 38, 35, 37, 40, 42, 45, 40, 38, 35, 37], color: 'beige'},
-	{name: 'Oil', prices: [80, 78, 82, 79, 77, 75, 76, 80, 78, 82, 79, 77, 75, 76], color: 'green'}
+	{name: 'Sauce', prices: json.sauce.previousValues.map((x) => Number(x.toFixed(2))), color: 'red'},
+	{name: 'Dough', prices: json.dough.previousValues.map((x) => Number(x.toFixed(2))), color: 'white'},
+	{name: 'Oil', prices: json.oil.previousValues.map((x) => Number(x.toFixed(2))), color: 'green'}
 ]
+
+const globalMaxPrice = Math.max(...items.flatMap((item) => item.prices))
+const globalMinPrice = Math.min(...items.flatMap((item) => item.prices))
+const globalPriceRange = globalMaxPrice - globalMinPrice
+const yScale = (height - 40) / globalPriceRange
 
 // Function to draw line graph for each item
 const drawLineGraph = (prices, color) => {
-	const maxPrice = Math.max(...prices)
-	const minPrice = Math.min(...prices)
-	const priceRange = maxPrice - minPrice
 	const xStep = width / (prices.length - 1)
-	const yScale = (height - 40) / priceRange
 
 	context.beginPath()
 	context.strokeStyle = color
@@ -31,7 +34,7 @@ const drawLineGraph = (prices, color) => {
 
 	prices.forEach((price, index) => {
 		const x = xStep * index
-		const y = height - (price - minPrice) * yScale - 20
+		const y = height - (price - globalMinPrice) * yScale - 20
 		if (index === 0) context.moveTo(x, y)
 		else context.lineTo(x, y)
 	})
