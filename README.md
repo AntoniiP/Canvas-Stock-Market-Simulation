@@ -7,4 +7,4 @@ The functions for generating prices comes from [Cookie Clicker's stock market](h
 
 A generated graph looks like this:
 
-![Stock market Graph](./example-graph.png)
+![Stock market Graph](./assets/example-graph.png)

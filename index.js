@@ -67,9 +67,9 @@ const drawVerticalLines = (prices) => {
 
 drawVerticalLines(items[0].prices) // Since all arrays have the same length
 ;(async () => {
-	await drawLineGraph(items[0].prices, items[0].color, './sauce.png') // Replace with your image path for sauce
-	await drawLineGraph(items[1].prices, items[1].color, './dough.png') // Replace with your image path for dough
-	await drawLineGraph(items[2].prices, items[2].color, './oil.png') // Replace with your image path for oil
+	await drawLineGraph(items[0].prices, items[0].color, './assets/sauce.png') 
+	await drawLineGraph(items[1].prices, items[1].color, './assets/dough.png') 
+	await drawLineGraph(items[2].prices, items[2].color, './assets/oil.png')
 
 	// Save canvas to file
 	const buffer = canvas.toBuffer('image/png')
