@@ -1,4 +1,4 @@
-const {createCanvas} = require('@napi-rs/canvas')
+const {createCanvas, loadImage} = require('@napi-rs/canvas')
 const fs = require('fs')
 
 const width = 800 // Graph width
@@ -25,19 +25,26 @@ const globalPriceRange = globalMaxPrice - globalMinPrice
 const yScale = (height - 40) / globalPriceRange
 
 // Function to draw line graph for each item
-const drawLineGraph = (prices, color) => {
-	const xStep = width / (prices.length - 1)
+const drawLineGraph = async (prices, color, imagePath) => {
+	const xStep = width / (prices.length - 1), image = await loadImage(imagePath), lastIndex = prices.length - 1
 
 	context.beginPath()
 	context.strokeStyle = color
 	context.lineWidth = 2
 
-	prices.forEach((price, index) => {
+
+	for (let index = 0; index < prices.length; index++) {
+		const price = prices[index]
 		const x = xStep * index
 		const y = height - (price - globalMinPrice) * yScale - 20
+
 		if (index === 0) context.moveTo(x, y)
 		else context.lineTo(x, y)
-	})
+		
+
+		if (index === lastIndex) context.drawImage(image, x - 10 - image.width / 2, y - image.height, image.width * 2, image.height * 2)
+		
+	}
 
 	context.stroke()
 }
@@ -49,7 +56,7 @@ const drawVerticalLines = (prices) => {
 	context.strokeStyle = '#737373' // Light grey color for the vertical lines
 	context.lineWidth = 1
 
-	prices.forEach((_, index) => {
+	prices.forEach((price, index) => {
 		const x = xStep * index
 		context.moveTo(x, 0)
 		context.lineTo(x, height)
@@ -59,14 +66,14 @@ const drawVerticalLines = (prices) => {
 }
 
 drawVerticalLines(items[0].prices) // Since all arrays have the same length
+;(async () => {
+	await drawLineGraph(items[0].prices, items[0].color, './sauce.png') // Replace with your image path for sauce
+	await drawLineGraph(items[1].prices, items[1].color, './dough.png') // Replace with your image path for dough
+	await drawLineGraph(items[2].prices, items[2].color, './oil.png') // Replace with your image path for oil
 
-// Drawing the line graph for each item
-items.forEach((item) => {
-	drawLineGraph(item.prices, item.color)
-})
+	// Save canvas to file
+	const buffer = canvas.toBuffer('image/png')
+	fs.writeFileSync('stock-market-graph.png', buffer)
 
-// Save canvas to file
-const buffer = canvas.toBuffer('image/png')
-fs.writeFileSync('stock-market-graph.png', buffer)
-
-console.log('Graph saved')
+	console.log('Graph saved')
+})()
